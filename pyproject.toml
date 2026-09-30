@@ -10,3 +10,8 @@ dependencies = [
     "numpy",
     "harbor",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Imports after the 'HARBOR ADAPTER — fixed harness' boundary are intentional;
+# the harness needs the file's main flow to define functions before the adapter imports.
+"agent-claude.py" = ["E402"]

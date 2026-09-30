@@ -9,11 +9,13 @@ Run all tasks:
   uv run harbor run -p tasks/ --agent-import-path agent:AutoAgent -o jobs
 """
 
-import asyncio, os, json
+import asyncio
+import os
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, ResultMessage, tool
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, ResultMessage
 from claude_agent_sdk.types import (
     AssistantMessage, UserMessage, TextBlock, ThinkingBlock,
     ToolUseBlock, ToolResultBlock,
@@ -153,7 +155,8 @@ def _trajectory_to_atif(messages: list, result_msg: ResultMessage | None) -> dic
     pending: dict[str, ToolUseBlock] = {}
 
     def _step(source, message, **kw):
-        nonlocal step_id; step_id += 1
+        nonlocal step_id
+        step_id += 1
         s = {"step_id": step_id, "timestamp": now, "source": source, "message": message}
         s.update({k: v for k, v in kw.items() if v is not None})
         return s
@@ -179,9 +182,12 @@ def _trajectory_to_atif(messages: list, result_msg: ResultMessage | None) -> dic
         elif isinstance(msg, AssistantMessage):
             texts, reasoning = [], None
             for b in msg.content:
-                if isinstance(b, TextBlock): texts.append(b.text)
-                elif isinstance(b, ThinkingBlock): reasoning = b.thinking
-                elif isinstance(b, ToolUseBlock): pending[b.id] = b
+                if isinstance(b, TextBlock):
+                    texts.append(b.text)
+                elif isinstance(b, ThinkingBlock):
+                    reasoning = b.thinking
+                elif isinstance(b, ToolUseBlock):
+                    pending[b.id] = b
             if texts or reasoning:
                 steps.append(_step("agent", "\n".join(texts) or "(thinking)",
                     reasoning_content=reasoning, model_name=msg.model))
