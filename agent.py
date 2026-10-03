@@ -222,20 +222,14 @@ class AutoAgent(BaseAgent):
         traj_path = self.logs_dir / "trajectory.json"
         traj_path.write_text(json.dumps(atif, indent=2))
 
-        try:
-            final_metrics = atif.get("final_metrics", {})
-            context.n_input_tokens = final_metrics.get("total_prompt_tokens", 0)
-            context.n_output_tokens = final_metrics.get("total_completion_tokens", 0)
-            context.n_cache_tokens = final_metrics.get("total_cached_tokens", 0)
-        except Exception:
-            pass
+        final_metrics = atif.get("final_metrics", {})
+        context.n_input_tokens = final_metrics.get("total_prompt_tokens", 0)
+        context.n_output_tokens = final_metrics.get("total_completion_tokens", 0)
+        context.n_cache_tokens = final_metrics.get("total_cached_tokens", 0)
 
-        usage = Usage()
-        for response in result.raw_responses:
-            usage.add(response.usage)
         print(
             f"turns={len(result.raw_responses)} duration_ms={duration_ms} "
-            f"input={usage.input_tokens} output={usage.output_tokens}"
+            f"input={context.n_input_tokens} output={context.n_output_tokens}"
         )
 
 
